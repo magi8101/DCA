@@ -1,0 +1,5 @@
+name: "google-cpp-style"
+title: "Google C++ Style Guide"
+description: "Write and review C++ code to the Google C++ Style Guide: naming, formatting, headers, classes, language-feature decisions and comments, with a mechanical checker for the automatable rules. Adapted for DCA: composition-only (no inheritance or virtuals), Status-based errors instead of exceptions, DCA_-prefixed header guards, and no per-file copyright headers."
+category: "Work and knowledge"
+include_in_prompt: false
