@@ -16,12 +16,11 @@ Early scaffold. The directory layout exists; no implementations have been writte
 ```
 .
 ├── .github/workflows/ci.yml   style checks on every push and pull request
-└── DCA/
-    ├── README.md
-    ├── .clang-format          Google style, used by CI and editors
-    └── src/
-        ├── Lossless/          lossless codecs
-        └── Losy/              lossy codecs
+├── .clang-format              Google style, used by CI and editors
+├── README.md
+└── src/
+    ├── Lossless/              lossless codecs
+    └── Lossy/                 lossy codecs
 ```
 
 ## Coding standards
@@ -104,10 +103,10 @@ Run the checks locally before pushing:
 
 ```sh
 pip install cpplint
-find DCA/src -type f \( -name '*.cc' -o -name '*.cpp' -o -name '*.cxx' \
+find src -type f \( -name '*.cc' -o -name '*.cpp' -o -name '*.cxx' \
   -o -name '*.h' -o -name '*.hpp' -o -name '*.hh' \) \
   -exec clang-format --dry-run --Werror {} +
-cpplint --recursive --linelength=80 --filter=-legal/copyright DCA/src
+cpplint --recursive --linelength=80 --filter=-legal/copyright src
 ```
 
 The copyright filter is deliberate: this project does not require per-file copyright headers, so leaving it on would fail every file.
@@ -135,7 +134,7 @@ The build tooling is still to be chosen, so there is nothing to compile yet. The
 
 ## Contributing
 
-Add a new codec as its own directory under `src/Lossless/` or `src/Losy/`, expose the shared `compress` / `decompress` interface, and include round-trip tests alongside the implementation. Contributions are expected to pass the style checks in CI.
+Add a new codec as its own directory under `src/Lossless/` or `src/Lossy/`, expose the shared `compress` / `decompress` interface, and include round-trip tests alongside the implementation. Contributions are expected to pass the style checks in CI.
 
 ## License
 

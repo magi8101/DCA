@@ -30,13 +30,13 @@ jobs:
         id: sources
         run: |
           set -euo pipefail
-          mapfile -t files < <(find DCA/src -type f \
+          mapfile -t files < <(find src -type f \
             \( -name '*.cc' -o -name '*.cpp' -o -name '*.cxx' \
                -o -name '*.h' -o -name '*.hpp' -o -name '*.hh' \) | sort)
           printf '%s\n' "${files[@]}" > "$RUNNER_TEMP/sources.txt"
           if [ "${#files[@]}" -eq 0 ]; then
             echo "found=false" >> "$GITHUB_OUTPUT"
-            echo "::notice title=No C++ sources::Nothing under DCA/src yet; skipping style checks."
+            echo "::notice title=No C++ sources::Nothing under src yet; skipping style checks."
           else
             echo "found=true" >> "$GITHUB_OUTPUT"
             printf '%s\n' "${files[@]}"
@@ -48,4 +48,4 @@ jobs:
 
       - name: Mechanical style checks (cpplint)
         if: steps.sources.outputs.found == 'true'
-        run: cpplint --recursive --linelength=80 --filter=-legal/copyright DCA/src
+        run: cpplint --recursive --linelength=80 --filter=-legal/copyright src
