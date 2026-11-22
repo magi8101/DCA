@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  style:
+    name: Google C++ style
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install style tooling
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-format
+          clang-format --version
+          python3 -m pip install --upgrade pip
+          python3 -m pip install cpplint
+          cpplint --version
+
+      - name: Collect C++ sources
+        id: sources
+        run: |
+          set -euo pipefail
+          mapfile -t files < <(find DCA/src -type f \
+            \( -name '*.cc' -o -name '*.cpp' -o -name '*.cxx' \
+               -o -name '*.h' -o -name '*.hpp' -o -name '*.hh' \) | sort)
+          printf '%s\n' "${files[@]}" > "$RUNNER_TEMP/sources.txt"
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=No C++ sources::Nothing under DCA/src yet; skipping style checks."
+          else
+            echo "found=true" >> "$GITHUB_OUTPUT"
+            printf '%s\n' "${files[@]}"
+          fi
+
+      - name: Check formatting (clang-format, Google style)
+        if: steps.sources.outputs.found == 'true'
+        run: xargs -d '\n' clang-format --dry-run --Werror < "$RUNNER_TEMP/sources.txt"
+
+      - name: Mechanical style checks (cpplint)
+        if: steps.sources.outputs.found == 'true'
+        run: cpplint --recursive --linelength=80 --filter=-legal/copyright DCA/src
