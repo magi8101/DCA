@@ -1,3 +1,8 @@
+---
+name: google-cpp-style
+description: Write and review C++ against the Google C++ Style Guide, adapted for the DCA compression project (composition-only, no exceptions, DCA header guards). Use when writing or reviewing C++ files, when applying naming/formatting/ownership rules, or when running the bundled style checker.
+---
+
 # Google C++ Style
 
 Write and review C++ against the Google C++ Style Guide
