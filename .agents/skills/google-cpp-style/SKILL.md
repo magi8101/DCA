@@ -102,16 +102,16 @@ Where the two disagree, `README.md` wins.
    the cast and `using` checks).
    For a stronger pass, run
    `python3 .agents/skills/google-cpp-style/scripts/review.py [--json]
-   [--build-dir build] [--cuda-path "$CUDA_PATH"] [--cuda-arch sm_75]
-   [--cuda-include-dir src] <files...>`. DCA has no CMake build yet, so
-   omit `--build-dir` until a compilation database exists. It combines the built-in scanner
-   with cpplint, `clang-format --style=file --dry-run`, and clang-tidy's
-   `google-*` checks when installed. C++ translation units use the CMake
-   compilation database when `--build-dir` is provided. CUDA translation
-   units use Clang CUDA mode with the selected toolkit, architecture, and
-   include directories. Headers are checked through their translation
-   units. Missing optional tools are reported as notes; use `--strict` in
-   CI to fail if clang-format or clang-tidy cannot run or parse a file.
+   [--strict] [--build-dir build] <files...>`. It runs the built-in
+   scanner, then cpplint with the same `--linelength=80` and
+   `-legal/copyright` flags CI uses, then `clang-format --style=file
+   --dry-run --Werror`, then clang-tidy's `google-*` checks. clang-tidy
+   runs only for `.cc`/`.cpp`/`.cxx` files and only when `--build-dir`
+   points at a directory containing `compile_commands.json`; headers are
+   covered through their translation units. DCA has no build system yet,
+   so expect clang-tidy to be skipped — that is a note, not a failure.
+   Missing optional tools are reported as notes; use `--strict` to turn an
+   installed-but-unusable clang-format or clang-tidy into a finding.
    The checker's test suite is `scripts/test_check_style.py`; run it
    after any change to the scripts.
 2. **Then review by topic**, loading only the reference file for the topic

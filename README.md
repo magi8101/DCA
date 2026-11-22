@@ -19,6 +19,7 @@ Early scaffold. The directory layout exists; no implementations have been writte
 ├── .clang-format              Google style, used by CI and editors
 ├── README.md
 └── src/
+    ├── Common/                shared code: byte/bit streams, status types
     ├── Lossless/              lossless codecs
     └── Lossy/                 lossy codecs
 ```
@@ -134,7 +135,7 @@ The build tooling is still to be chosen, so there is nothing to compile yet. The
 
 ## Contributing
 
-Add a new codec as its own directory under `src/Lossless/` or `src/Lossy/`, expose the shared `compress` / `decompress` interface, and include round-trip tests alongside the implementation. Contributions are expected to pass the style checks in CI.
+Shared machinery belongs in `src/Common/`, not in a codec directory. Add a new codec as its own directory under `src/Lossless/` or `src/Lossy/`, expose the shared `compress` / `decompress` interface, and include round-trip tests alongside the implementation. Contributions are expected to pass the style checks in CI.
 
 ## License
 

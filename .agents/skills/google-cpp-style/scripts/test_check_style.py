@@ -2,6 +2,7 @@
 """Tests for check_style.py and review.py. Run: python3 test_check_style.py"""
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -221,27 +222,41 @@ class TestCli(unittest.TestCase):
 
 
 class TestReviewCommands(unittest.TestCase):
+    def setUp(self):
+        self.build_dir = tempfile.mkdtemp(dir="/tmp")
+        with open(os.path.join(self.build_dir, "compile_commands.json"),
+                  "w") as fh:
+            fh.write("[]\n")
+
+    def tearDown(self):
+        shutil.rmtree(self.build_dir)
+
     def test_cpp_uses_compilation_database(self):
         command = review.clang_tidy_command(
-            "clang-tidy", "src/workload.cc", "build", None, "sm_75", [])
+            "clang-tidy", "src/workload.cc", self.build_dir)
         self.assertIn("-p", command)
-        self.assertIn("build", command)
+        self.assertIn(self.build_dir, command)
         self.assertEqual(command[-1], "src/workload.cc")
 
-    def test_cuda_uses_cuda_toolkit_and_architecture(self):
-        command = review.clang_tidy_command(
-            "clang-tidy", "src/main.cu", "build", "/opt/cuda", "sm_86",
-            ["src"])
-        self.assertIn("-x", command)
-        self.assertIn("cuda", command)
-        self.assertIn("--cuda-path=/opt/cuda", command)
-        self.assertIn("--cuda-gpu-arch=sm_86", command)
-        self.assertIn("-I", command)
+    def test_no_build_dir_skips_tidy(self):
+        self.assertIsNone(
+            review.clang_tidy_command("clang-tidy", "src/a.cc", None))
 
-    def test_header_is_analyzed_through_translation_units(self):
-        command = review.clang_tidy_command(
-            "clang-tidy", "src/workload.h", "build", None, "sm_75", [])
-        self.assertIsNone(command)
+    def test_missing_compilation_database_skips_tidy(self):
+        empty = tempfile.mkdtemp(dir="/tmp")
+        try:
+            self.assertIsNone(
+                review.clang_tidy_command("clang-tidy", "src/a.cc", empty))
+        finally:
+            shutil.rmtree(empty)
+
+    def test_header_is_not_analyzed_directly(self):
+        self.assertIsNone(review.clang_tidy_command(
+            "clang-tidy", "src/workload.h", self.build_dir))
+
+    def test_non_cpp_file_is_not_analyzed(self):
+        self.assertIsNone(review.clang_tidy_command(
+            "clang-tidy", "README.md", self.build_dir))
 
 
 if __name__ == "__main__":
